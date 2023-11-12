@@ -5,7 +5,7 @@
 - Status do projeto: Em desenvolvimento;
   
 - Tecnologias que serão aplicadas: Projeto a ser desenvolvido utilizando as linguagens HTML, CSS, JavaScropt, SQL.
-                                   Feito na Java Neatbeans IDE e utilizando o MySQL workbench como o banco de dados;
+                                   Feito na Java Neatbeans IDE associada ao MySQL workbench;
   
 - Desenvolvedor: Gustavo Ferreira Tavares;
   
