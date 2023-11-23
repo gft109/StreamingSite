@@ -13,4 +13,4 @@
   
 - Funcionalidades do sistema:
   - Listar músicas de uma playlist já existente: Nome da música e do artista e imagem associada a música ou album;
-  -  tocar musicas da playlist: botões de tocar/parar, ir para a próxima/anterior, controle do volume e slider de adiantar/retroceder a música.
+  -  tocar musicas da playlist: botões de tocar/parar, ir para a próxima/anterior, slider de adiantar/retroceder a música, randomizar playlist e loop da musica.
