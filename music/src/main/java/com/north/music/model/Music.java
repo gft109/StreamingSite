@@ -5,7 +5,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,9 +25,9 @@ public class Music {
     
     private String artist;
     
-    @Lob
-    private byte[] image;
+    private String image;
+
+    private String audio;
     
-    @Lob
-    private byte[] audio;
+    private String audioDuration;
 }

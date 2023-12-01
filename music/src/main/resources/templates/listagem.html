@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listagem de Músicas</title>
+</head>
+<body>
+    
+    
+    <form action="/listagem" method="get">
+        <label>Escolha um índice:</label>
+        <input type="number" id="index" name="index" >
+        <button type="submit">Atualizar Música</button>
+    </form>
+    
+    
+    <!-- Mostra os dados da primeira música na lista -->
+    <div th:if="${musicPlaying != null}">
+        <p><strong>Nome:</strong> <span th:text="${musicPlaying.name}"></span></p>
+        <p><strong>Artista:</strong> <span th:text="${musicPlaying.artist}"></span></p>
+        <img th:src="@{${musicPlaying.image}}" alt="Imagem da Música" style="max-width: 300px;">
+        <audio controls>
+            <source th:src="@{${musicPlaying.audio}}" type="audio/mp3">
+        </audio>
+    </div>
+    
+    
+    <h1>Listagem de Músicas</h1>
+
+    <ul>
+        <li th:each="music : ${lista}">
+            <p><strong>Nome:</strong> <span th:text="${music.name}"></span></p>
+            <p><strong>Artista:</strong> <span th:text="${music.artist}"></span></p>
+            <img th:src="@{${music.image}}" alt="Imagem da Música" style="max-width: 300px;">
+            <audio controls>
+                <source th:src="@{${music.audio}}" type="audio/mp3">
+            </audio>
+        </li>
+    </ul>
+    
+    
+
+</body>
+</html>

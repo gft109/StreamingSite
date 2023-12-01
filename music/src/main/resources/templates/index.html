@@ -277,9 +277,14 @@
     </head>
     <body>
         <div class="wrapper">
+            
+            <form action="/changeMusic" method="get" id="formBase">
+                <input type="hidden" name="index" th:value="${indexOfList}" id="indexBase">
+                <input type="hidden"  th:value="${lista.size()}" id="listaSize">
+            </form>
 
             <nav class="top-bar">
-                <a href="/">
+                <a>
                     <i class="fa-solid fa-angle-left"></i> 
                 </a>
                 <span>Now Playing</span>
@@ -296,28 +301,34 @@
                 </div>
                 <ul>
                     <!-- here li list are coming from js -->
-                </ul>
+                    <li th:each="music : ${lista}" >
+                        <span th:text="${music.name}"></span> - <span id="timeInList" th:text="@{${music.audioDuration}}">0:00</span>
+                    </li>
+                </ul>   
             </div>
 
 
             <div class="img-area">
-                <img src="" alt="">
+                <!-- Use Thymeleaf para definir o src da imagem -->
+                <img th:src="@{${musicPlaying.image}}" alt="Imagem da Música">
             </div>
-
 
 
             <div class="song-details">
-                <h1 class="name"> Name </h1>
-                <p class="artist"> Artist </p>
+                <!-- Use Thymeleaf para incluir o nome e o artista -->
+                <h1 class="name" th:text="${musicPlaying.name}">Nome</h1>
+                <p class="artist" th:text="${musicPlaying.artist}">Artista</p>
             </div>
+            
 
+            
             <div class="progress-area">
                 <div class="progress-bar">
-                    <audio id="main-audio" src=""></audio>
+                    <audio id="mainAudio" th:src="@{${musicPlaying.audio}}"></audio>
                 </div>
                 <div class="song-timer">
                     <span class="current-time">0:00</span>
-                    <span class="max-duration">0:00</span>
+                    <span class="max-duration" th:text="@{${musicPlaying.audioDuration}}">0:00</span>
                 </div>
             </div>
 
@@ -329,305 +340,216 @@
             </nav>
 
             <nav class="controls">
-                <div><i id="prev" class="fa-solid fa-backward-step"></i></div>
-                <div class="play-pause">
-                    <i class="fa-solid fa-play"></i>
+                <div>
+                    
+                    <form action="/changeMusic" method="get" id="prevForm">
+                        <i id="prev" class="fa-solid fa-backward-step"></i>
+                        <input type="hidden" name="index" th:value="${indexOfList}" id="prevInput">
+                    </form>
                 </div>
-                <div><i id="next" class="fa-solid fa-forward-step"></i></div>
+                <div class="play-pause" >
+                    <i id="play-pause-icon" class="fa-solid fa-play"></i>
+                </div>
+                <div>
+                    <form action="/changeMusic" method="get" id="nextForm">
+                        <i id="next" class="fa-solid fa-forward-step"></i>
+                        <input type="hidden" name="index" th:value="${indexOfList}" id="nextInput">
+                    </form>
+                </div>
             </nav>
 
 
 
         </div>
-
-        <!-- playlist -->
-        <script>
-            let allMusic = [
-                {
-                    name: "Harley Bird - Home",
-                    artist: "Jordan Schor",
-                    img: "music-1",
-                    src: "music-1"
-                },
-                {
-                    name: "Ikson Anywhere – Ikson",
-                    artist: "Audio Library",
-                    img: "music-2",
-                    src: "music-2"
-                },
-                {
-                    name: "Beauz & Jvna - Crazy",
-                    artist: "Beauz & Jvna",
-                    img: "music-3",
-                    src: "music-3"
-                },
-                {
-                    name: "Hardwind - Want Me",
-                    artist: "Mike Archangelo",
-                    img: "music-4",
-                    src: "music-4"
-                },
-                {
-                    name: "Jim - Sun Goes Down",
-                    artist: "Jim Yosef x Roy",
-                    img: "music-5",
-                    src: "music-5"
-                },
-                {
-                    name: "Lost Sky - Vision NCS",
-                    artist: "NCS Release",
-                    img: "music-6",
-                    src: "music-6"
-                }
-            ];
-        </script>
-
-        <!-- functions -->
-        <script>
-
+        <script th:inline="javascript">
             const wrapper = document.querySelector(".wrapper"),
-                    musicImg = wrapper.querySelector(".img-area img"),
-                    musicName = wrapper.querySelector(".song-details .name"),
-                    musicArtist = wrapper.querySelector(".song-details .artist"),
-                    playPauseBtn = wrapper.querySelector(".play-pause"),
-                    prevBtn = wrapper.querySelector("#prev"),
-                    nextBtn = wrapper.querySelector("#next"),
-                    mainAudio = wrapper.querySelector("#main-audio"),
-                    progressArea = wrapper.querySelector(".progress-area"),
-                    progressBar = progressArea.querySelector(".progress-bar"),
-                    musicList = wrapper.querySelector(".music-list"),
-                    moreMusicBtn = wrapper.querySelector("#more-music"),
-                    closemoreMusic = musicList.querySelector("#close");
+                musicImg = wrapper.querySelector(".img-area img"),
+                musicName = wrapper.querySelector(".song-details .name"),
+                musicArtist = wrapper.querySelector(".song-details .artist"),
+                playPauseBtn = wrapper.querySelector(".play-pause"),
+                prevBtn = wrapper.querySelector("#prev"),
+                nextBtn = wrapper.querySelector("#next"),
+                mainAudio = wrapper.querySelector("#mainAudio"),
+                progressArea = wrapper.querySelector(".progress-area"),
+                progressBar = progressArea.querySelector(".progress-bar"),
+                musicList = wrapper.querySelector(".music-list"),
+                moreMusicBtn = wrapper.querySelector("#more-music"),
+                closemoreMusic = musicList.querySelector("#close");
+                const max = document.getElementById("listaSize").value;
+                let musicIndex;
 
-            let musicIndex = Math.floor((Math.random() * allMusic.length) + 1);
-            isMusicPaused = true;
+                
+                
+                window.onload = function() {
+                    musicIndex = parseInt(document.getElementById("indexBase").value);
+                    //updateProgress();
+                };
+                
+    // adapt for data base data
+                function loadMusic(indexNumb) {
+                    const indexInput = document.getElementById("indexBase");
+                    // Atualizar o valor do campo de entrada
+                    indexInput.value = indexNumb;
+                    console.log(indexInput.value);
+                    // Enviar o formulário
+                    const formBase = document.getElementById("formBase");
+                    formBase.submit();
+                }
+                
+                function playMusic() {
+                    wrapper.classList.add("paused");
+                    playPauseBtn.querySelector("i").classList.add("fa-pause");
+                    playPauseBtn.querySelector("i").classList.remove("fa-play");
+                    mainAudio.play();
+                }
+                function pauseMusic() {
+                    wrapper.classList.remove("paused");
+                    playPauseBtn.querySelector("i").classList.add("fa-play");
+                    playPauseBtn.querySelector("i").classList.remove("fa-pause");
+                    mainAudio.pause();
+                }
+                
+                playPauseBtn.addEventListener("click", () => {
+                    let isMusicPlay = wrapper.classList.contains("paused");
+                    //if isPlayMusic is true then call pauseMusic else call playMusic
+                    isMusicPlay ? pauseMusic() : playMusic();
+                    //playingSong();
+                });
+                
+                function nextMusic(){
+                    // Calcular o próximo índice
+                    const nextIndex = musicIndex + 1;
+                    const indexInput = document.getElementById("nextInput");
+                    // Atualizar o valor do campo de entrada
+                     if (nextIndex > max) {
+                        indexInput.value = 1;
+                    } else {
+                        indexInput.value = nextIndex;
+                    }
 
-            window.addEventListener("load", () => {
-                loadMusic(musicIndex);
-                playingSong();
-            });
+                    // Enviar o formulário
+                    const nextForm = document.getElementById("nextForm");
+                    nextForm.submit();
+                }
+                
+                nextBtn.addEventListener("click", () => {
+                    nextMusic();
+                });
 
-// adapt for data base data
-            function loadMusic(indexNumb) {
-                musicName.innerText = allMusic[indexNumb - 1].name;
-                musicArtist.innerText = allMusic[indexNumb - 1].artist;
-                musicImg.src = `${allMusic[indexNumb - 1].src}.jpg`;
-                mainAudio.src = `${allMusic[indexNumb - 1].src}.mp3`;
-            }
+                prevBtn.addEventListener("click", () => {
+                    // Calcular o próximo índice
+                    const prevIndex = musicIndex - 1;
+                    const indexInput = document.getElementById("prevInput");
+                    // Atualizar o valor do campo de entrada
+                     if (prevIndex <1) {
+                        indexInput.value = max;
+                    } else {
+                        indexInput.value = prevIndex;
+                    }
 
-//play music function
-            function playMusic() {
-                wrapper.classList.add("paused");
-                playPauseBtn.querySelector("i").classList.add("fa-pause");
-                playPauseBtn.querySelector("i").classList.remove("fa-play");
-                mainAudio.play();
-            }
-//pause music function
-            function pauseMusic() {
-                wrapper.classList.remove("paused");
-                playPauseBtn.querySelector("i").classList.add("fa-play");
-                playPauseBtn.querySelector("i").classList.remove("fa-pause");
-                mainAudio.pause();
-            }
+                    // Enviar o formulário
+                    const prevForm = document.getElementById("prevForm");
+                    prevForm.submit();
+                });
+                
+    
+    // update progress bar width and song time information
+                function updateProgress() {
+                    const currentTime = mainAudio.currentTime;
+                    const duration = mainAudio.duration;
+                    const progressWidth = (currentTime / duration) * 100;
 
-//prev music function
-            function prevMusic() {
-                musicIndex--; //decrement of musicIndex by 1
-                //if musicIndex is less than 1 then musicIndex will be the array length so the last music play
-                musicIndex < 1 ? musicIndex = allMusic.length : musicIndex = musicIndex;
-                loadMusic(musicIndex);
-                playMusic();
-                playingSong();
-            }
+                    progressBar.style.width = `${progressWidth}%`;
 
-//next music function
-            function nextMusic() {
-                musicIndex++; //increment of musicIndex by 1
-                //if musicIndex is greater than array length then musicIndex will be 1 so the first music play
-                musicIndex > allMusic.length ? musicIndex = 1 : musicIndex = musicIndex;
-                loadMusic(musicIndex);
-                playMusic();
-                playingSong();
-            }
+                    const musicCurrentTime = wrapper.querySelector(".current-time");
+                    const musicDuration = wrapper.querySelector(".max-duration");
 
-// play or pause button event
-            playPauseBtn.addEventListener("click", () => {
-                const isMusicPlay = wrapper.classList.contains("paused");
-                //if isPlayMusic is true then call pauseMusic else call playMusic
-                isMusicPlay ? pauseMusic() : playMusic();
-                playingSong();
-            });
-
-//prev music button event
-            prevBtn.addEventListener("click", () => {
-                prevMusic();
-            });
-
-//next music button event
-            nextBtn.addEventListener("click", () => {
-                nextMusic();
-            });
-
-// update progress bar width according to music current time
-            mainAudio.addEventListener("timeupdate", (e) => {
-                const currentTime = e.target.currentTime; //getting playing song currentTime
-                const duration = e.target.duration; //getting playing song total duration
-                let progressWidth = (currentTime / duration) * 100;
-                progressBar.style.width = `${progressWidth}%`;
-
-                let musicCurrentTime = wrapper.querySelector(".current-time"),
-                        musicDuartion = wrapper.querySelector(".max-duration");
-                mainAudio.addEventListener("loadeddata", () => {
                     // update song total duration
-                    let mainAdDuration = mainAudio.duration;
-                    let totalMin = Math.floor(mainAdDuration / 60);
-                    let totalSec = Math.floor(mainAdDuration % 60);
-                    if (totalSec < 10) { //if sec is less than 10 then add 0 before it
+                    let totalMin = Math.floor(duration / 60);
+                    let totalSec = Math.floor(duration % 60);
+                    if (totalSec < 10) {
                         totalSec = `0${totalSec}`;
                     }
-                    musicDuartion.innerText = `${totalMin}:${totalSec}`;
+                    musicDuration.innerText = `${totalMin}:${totalSec}`;
+
+                    // update playing song current time
+                    let currentMin = Math.floor(currentTime / 60);
+                    let currentSec = Math.floor(currentTime % 60);
+                    if (currentSec < 10) {
+                        currentSec = `0${currentSec}`;
+                    }
+                    musicCurrentTime.innerText = `${currentMin}:${currentSec}`;
+                }
+
+    // update progress bar and time on timeupdate
+                mainAudio.addEventListener("timeupdate", updateProgress);
+
+    // update progress bar on click
+                progressArea.addEventListener("click", (e) => {
+                    const progressWidth = progressArea.clientWidth;
+                    const clickedOffsetX = e.offsetX;
+                    const songDuration = mainAudio.duration;
+
+                    mainAudio.currentTime = (clickedOffsetX / progressWidth) * songDuration;
+                    playMusic();
+                    updateProgress();
                 });
-                // update playing song current time
-                let currentMin = Math.floor(currentTime / 60);
-                let currentSec = Math.floor(currentTime % 60);
-                if (currentSec < 10) { //if sec is less than 10 then add 0 before it
-                    currentSec = `0${currentSec}`;
-                }
-                musicCurrentTime.innerText = `${currentMin}:${currentSec}`;
-            });
 
-// update playing song currentTime on according to the progress bar width
-            progressArea.addEventListener("click", (e) => {
-                let progressWidth = progressArea.clientWidth; //getting width of progress bar
-                let clickedOffsetX = e.offsetX; //getting offset x value
-                let songDuration = mainAudio.duration; //getting song total duration
+                let shuffleActive = false;
+                let repeatActive = false;
+    //change icon color onclick
+                function changeColor(circleElement) {
+                    var currentColor = window.getComputedStyle(circleElement).color;
 
-                mainAudio.currentTime = (clickedOffsetX / progressWidth) * songDuration;
-                playMusic(); //calling playMusic function
-                playingSong();
-            });
-
-            let shuffleActive = false
-            let repeatActive = false
-//change icon color onclick
-            function changeColor(circleElement) {
-                var currentColor = window.getComputedStyle(circleElement).color;
-
-                if (currentColor === 'rgb(255, 255, 255)' || currentColor === '#fff') {
-                    circleElement.style.color = "#ae00ff";
-                    if (circleElement == shuffleIcon) {
-                        shuffleActive = true;
+                    if (currentColor === 'rgb(255, 255, 255)' || currentColor === '#fff') {
+                        circleElement.style.color = "#ae00ff";
+                        if (circleElement === shuffleIcon) {
+                            shuffleActive = true;
+                        } else {
+                            repeatActive = true;
+                        }
                     } else {
-                        repeatActive = true;
-                    }
-                } else {
-                    circleElement.style.color = "#fff";
-                    if (circleElement == shuffleIcon) {
-                        shuffleActive = false;
-                    } else {
-                        repeatActive = false;
+                        circleElement.style.color = "#fff";
+                        if (circleElement === shuffleIcon) {
+                            shuffleActive = false;
+                        } else {
+                            repeatActive = false;
+                        }
                     }
                 }
-            }
-
-//code for what to do after song ended *** MODIFICAR **
-            mainAudio.addEventListener("ended", () => {
+    //code for what to do after song ended
+                mainAudio.addEventListener("ended", () => {
                 if (shuffleActive) {
-                    let randIndex = Math.floor((Math.random() * allMusic.length) + 1); //generating random index/numb with max range of array length
+                    let randIndex;
                     do {
-                        randIndex = Math.floor((Math.random() * allMusic.length) + 1);
-                    } while (musicIndex == randIndex); //this loop runs until the next random number won't be the same as the current musicIndex
+                        randIndex = Math.floor((Math.random() * max) + 1);
+                    } while (musicIndex === randIndex); //this loop runs until the next random number won't be the same as the current musicIndex
+                    console.log(randIndex);
                     musicIndex = randIndex; //passing randomIndex to musicIndex
                     loadMusic(musicIndex);
-                    playMusic();
-                    playingSong();
+                    //playMusic();
+                    //playingSong();
                 } else if (repeatActive) {
                     mainAudio.currentTime = 0; //setting audio current time to 0
                     loadMusic(musicIndex); //calling loadMusic function with an argument, in the argument, there is an index of the current song
-                    playMusic(); //calling playMusic function
+                    //playMusic(); //calling playMusic function
                 } else {
                     nextMusic(); //calling nextMusic function
                 }
             });
-
-
-//show music list onclick of music icon
-            moreMusicBtn.addEventListener("click", () => {
-                musicList.classList.toggle("show");
-            });
-//close music list onclick of music icon
-            closemoreMusic.addEventListener("click", () => {
-                moreMusicBtn.click();
-            });
-
-            const ulTag = wrapper.querySelector("ul");
-
-// let create li tags according to array length for list
-            for (let i = 0; i < allMusic.length; i++) {
-                //let's pass the song name, artist from the array
-                let liTag = `<li li-index="${i + 1}">
-                            <div class="row">
-                            <span>${allMusic[i].name}</span>
-                            <p>${allMusic[i].artist}</p>
-                            </div>
-                            <span id="${allMusic[i].src}" class="audio-duration">3:40</span>
-                            <audio class="${allMusic[i].src}" src="${allMusic[i].src}.mp3"></audio>
-                        </li>`;
-                ulTag.insertAdjacentHTML("beforeend", liTag); //inserting the li inside ul tag
-
-                let liAudioDuartionTag = ulTag.querySelector(`#${allMusic[i].src}`);
-                let liAudioTag = ulTag.querySelector(`.${allMusic[i].src}`);
-                liAudioTag.addEventListener("loadeddata", () => {
-                    let duration = liAudioTag.duration;
-                    let totalMin = Math.floor(duration / 60);
-                    let totalSec = Math.floor(duration % 60);
-                    if (totalSec < 10) { //if sec is less than 10 then add 0 before it
-                        totalSec = `0${totalSec}`;
-                    }
-                    ;
-                    liAudioDuartionTag.innerText = `${totalMin}:${totalSec}`; //passing total duation of song
-                    liAudioDuartionTag.setAttribute("t-duration", `${totalMin}:${totalSec}`); //adding t-duration attribute with total duration value
+    //show music list onclick of music icon
+                moreMusicBtn.addEventListener("click", () => {
+                    musicList.classList.toggle("show");
                 });
-            }
-
-//play particular song from the list onclick of li tag
-            function playingSong() {
-                const allLiTag = ulTag.querySelectorAll("li");
-
-                for (let j = 0; j < allLiTag.length; j++) {
-                    let audioTag = allLiTag[j].querySelector(".audio-duration");
-
-                    if (allLiTag[j].classList.contains("playing")) {
-                        allLiTag[j].classList.remove("playing");
-                        let adDuration = audioTag.getAttribute("t-duration");
-                        audioTag.innerText = adDuration;
-                        audioTag.style.color = "#fff";
-                    }
-
-                    //if the li tag index is equal to the musicIndex then add playing class in it
-                    if (allLiTag[j].getAttribute("li-index") == musicIndex) {
-                        allLiTag[j].classList.add("playing");
-                        audioTag.innerText = "Playing";
-                        audioTag.style.color = "#C8A0FF";
-                    }
-
-                    allLiTag[j].setAttribute("onclick", "clicked(this)");
-                }
-            }
-
-//particular li clicked function
-            function clicked(element) {
-                let getLiIndex = element.getAttribute("li-index");
-                musicIndex = getLiIndex; //updating current song index with clicked li index
-                loadMusic(musicIndex);
-                playMusic();
-                playingSong();
-            }
+    //close music list onclick of music icon
+                closemoreMusic.addEventListener("click", () => {
+                    moreMusicBtn.click();
+                });
 
 
-
-
+                
         </script>
+
 
     </body>
 </html>
